@@ -96,9 +96,11 @@ Unidragger.prototype._bindHandles = function( isBind ) {
   }
   // munge isBind, default to true
   isBind = isBind === undefined ? true : !!isBind;
+  var bindMethod = isBind ? 'bind' : 'unbind';
   for ( var i=0, len = this.handles.length; i < len; i++ ) {
     var handle = this.handles[i];
     binder.call( this, handle, isBind );
+    eventie[ bindMethod ]( handle, 'click', this );
   }
 };
 
