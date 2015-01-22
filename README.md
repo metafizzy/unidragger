@@ -11,6 +11,12 @@ Unidragger handles all the event binding and handling to support a draggable lib
 + Touch device support: iOS, Android, Microsoft Surface
 + Handles click events in `input` elements 
 
+## Install
+
+Bower: `bower install unidragger --save`
+
+npm: `npm install unidragger --save`
+
 ## Demo code
 
 ``` js
