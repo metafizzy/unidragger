@@ -284,7 +284,8 @@ Unidragger.prototype.ontouchmove = function( event ) {
   }
 };
 
-var hasDragStartedDefault = Unidragger.hasDragStartedDefault = function( moveVector ) {
+// condition if pointer has moved far enough to start drag
+Unidragger.prototype.hasDragStarted = function( moveVector ) {
   return Math.abs( moveVector.x ) > 3 || Math.abs( moveVector.y ) > 3;
 };
 
@@ -299,10 +300,8 @@ Unidragger.prototype._pointerMove = function( event, pointer ) {
     x: movePoint.x - this.pointerDownPoint.x,
     y: movePoint.y - this.pointerDownPoint.y
   };
-  // function to check if pointer has moved far enough to start drag
-  var hasDragStarted = this.hasDragStarted || hasDragStartedDefault;
-  // start drag
-  if ( !this.isDragging && hasDragStarted( moveVector ) ) {
+  // start drag if pointer has moved far enough to start drag
+  if ( !this.isDragging && this.hasDragStarted( moveVector ) ) {
     this._dragStart( event, pointer );
   }
 
