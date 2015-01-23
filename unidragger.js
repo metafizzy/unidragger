@@ -209,21 +209,16 @@ Unidragger.prototype._pointerDown = function( event, pointer ) {
   // track to see when dragging starts
   this.pointerDownPoint = Unidragger.getPointerPoint( pointer );
 
-  var targetNodeName = event.target.nodeName;
   // HACK iOS, allow clicks on buttons, inputs, and links
   var isTouchstart = event.type == 'touchstart';
-  var isTouchstartNode = allowTouchstartNodes[ targetNodeName ];
+  var isTouchstartNode = allowTouchstartNodes[ event.target.nodeName ];
   if ( !isTouchstart || ( isTouchstart && !isTouchstartNode ) ) {
     preventDefaultEvent( event );
   }
   // kludge to blur focused inputs in dragger
   var focused = document.activeElement;
-  if ( focused && focused.blur && focused != this.element ) {
+  if ( focused && focused.blur ) {
     focused.blur();
-  }
-  // focus element, if its not an input
-  if ( this.options.accessibility && targetNodeName != 'INPUT' ) {
-    this.element.focus();
   }
 
   // bind move and end events
