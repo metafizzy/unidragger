@@ -370,7 +370,9 @@ Unidragger.prototype.onpointercancel = function( event ) {
 
 Unidragger.prototype.ontouchcancel = function( event ) {
   var touch = this.getTouch( event.changedTouches );
-  this._pointerUp( event, touch );
+  if ( touch ) {
+    this._pointerUp( event, touch );
+  }
 };
 
 // -------------------------- drag -------------------------- //
