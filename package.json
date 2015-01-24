@@ -4,7 +4,7 @@
   "description": "Base draggable class",
   "main": "unidragger.js",
   "dependencies": {
-    "eventie": "^1.0.6"
+    "unipointer": "~0.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

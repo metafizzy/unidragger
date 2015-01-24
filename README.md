@@ -49,3 +49,9 @@ Dragger.prototype.dragEnd = function( event, pointer ) {
   console.log('drag end');
 };
 ```
+
+---
+
+MIT license
+
+By [Metafizzy](http://metafizzy.co)

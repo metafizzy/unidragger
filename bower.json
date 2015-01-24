@@ -3,7 +3,7 @@
   "main": "unidragger.js",
   "version": "0.1.0",
   "dependencies": {
-    "eventie": "~1.0.6"
+    "unipointer": "~0.1.0"
   },
   "authors": [
     "David DeSandro <desandrocodes@gmail.com>"
