@@ -128,7 +128,7 @@ var disableImgOndragstart = !isIE8 ? noop : function( handle ) {
 
 // ----- start event ----- //
 
-var allowTouchstartNodes = {
+var allowTouchstartNodes = Unidragger.allowTouchstartNodes = {
   INPUT: true,
   A: true,
   BUTTON: true
@@ -289,6 +289,8 @@ Unidragger.getPointerPoint = function( pointer ) {
 };
 
 // -----  ----- //
+
+Unidragger.getPointerPoint = Unipointer.getPointerPoint;
 
 return Unidragger;
 
