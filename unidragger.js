@@ -140,6 +140,19 @@ var allowTouchstartNodes = Unidragger.allowTouchstartNodes = {
  * @param {Event or Touch} pointer
  */
 Unidragger.prototype.pointerDown = function( event, pointer ) {
+  this._dragPointerDown( event, pointer );
+  // kludge to blur focused inputs in dragger
+  var focused = document.activeElement;
+  if ( focused && focused.blur ) {
+    focused.blur();
+  }
+  // bind move and end events
+  this._bindPostStartEvents( event );
+  this.emitEvent( 'pointerDown', [ this, event, pointer ] );
+};
+
+// base pointer down logic
+Unidragger.prototype._dragPointerDown = function( event, pointer ) {
   // track to see when dragging starts
   this.pointerDownPoint = Unipointer.getPointerPoint( pointer );
 
@@ -150,16 +163,6 @@ Unidragger.prototype.pointerDown = function( event, pointer ) {
   if ( !isTouchstart || ( isTouchstart && !isTouchstartNode ) ) {
     preventDefaultEvent( event );
   }
-  // kludge to blur focused inputs in dragger
-  var focused = document.activeElement;
-  if ( focused && focused.blur ) {
-    focused.blur();
-  }
-
-  // bind move and end events
-  this._bindPostStartEvents( event );
-
-  this.emitEvent( 'pointerDown', [ this, event, pointer ] );
 };
 
 // ----- move event ----- //
@@ -170,6 +173,13 @@ Unidragger.prototype.pointerDown = function( event, pointer ) {
  * @param {Event or Touch} pointer
  */
 Unidragger.prototype.pointerMove = function( event, pointer ) {
+  var moveVector = this._dragPointerMove( event, pointer );
+  this.emitEvent( 'pointerMove', [ this, event, pointer, moveVector ] );
+  this._dragMove( event, pointer, moveVector );
+};
+
+// base pointer move logic
+Unidragger.prototype._dragPointerMove = function( event, pointer ) {
   var movePoint = Unipointer.getPointerPoint( pointer );
   var moveVector = {
     x: movePoint.x - this.pointerDownPoint.x,
@@ -179,9 +189,7 @@ Unidragger.prototype.pointerMove = function( event, pointer ) {
   if ( !this.isDragging && this.hasDragStarted( moveVector ) ) {
     this._dragStart( event, pointer );
   }
-
-  this.emitEvent( 'pointerMove', [ this, event, pointer, moveVector ] );
-  this._dragMove( event, pointer, moveVector );
+  return moveVector;
 };
 
 // condition if pointer has moved far enough to start drag
@@ -198,14 +206,17 @@ Unidragger.prototype.hasDragStarted = function( moveVector ) {
  * @param {Event or Touch} pointer
  */
 Unidragger.prototype.pointerUp = function( event, pointer ) {
+  this._dragPointerUp( event, pointer );
+  this.emitEvent( 'pointerUp', [ this, event, pointer ] );
+};
+
+Unidragger.prototype._dragPointerUp = function( event, pointer ) {
   if ( this.isDragging ) {
     this._dragEnd( event, pointer );
   } else {
     // pointer didn't move enough for drag to start
     this._staticClick( event, pointer );
   }
-
-  this.emitEvent( 'pointerUp', [ this, event, pointer ] );
 };
 
 // -------------------------- drag -------------------------- //
