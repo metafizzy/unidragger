@@ -206,8 +206,8 @@ Unidragger.prototype.hasDragStarted = function( moveVector ) {
  * @param {Event or Touch} pointer
  */
 Unidragger.prototype.pointerUp = function( event, pointer ) {
-  this._dragPointerUp( event, pointer );
   this.emitEvent( 'pointerUp', [ this, event, pointer ] );
+  this._dragPointerUp( event, pointer );
 };
 
 Unidragger.prototype._dragPointerUp = function( event, pointer ) {
