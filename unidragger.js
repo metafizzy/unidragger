@@ -131,7 +131,8 @@ var disableImgOndragstart = !isIE8 ? noop : function( handle ) {
 var allowTouchstartNodes = Unidragger.allowTouchstartNodes = {
   INPUT: true,
   A: true,
-  BUTTON: true
+  BUTTON: true,
+  SELECT: true
 };
 
 /**
@@ -158,9 +159,9 @@ Unidragger.prototype._dragPointerDown = function( event, pointer ) {
 
   var targetNodeName = event.target.nodeName;
   // HACK iOS, allow clicks on buttons, inputs, and links
-  var isTouchstart = event.type == 'touchstart';
-  var isTouchstartNode = allowTouchstartNodes[ targetNodeName ];
-  if ( !isTouchstart || ( isTouchstart && !isTouchstartNode ) ) {
+  var isTouchstartNode = event.type == 'touchstart' && allowTouchstartNodes[ targetNodeName ];
+  // do not prevent default on touchstart nodes or <select>
+  if ( !isTouchstartNode && targetNodeName != 'SELECT' ) {
     preventDefaultEvent( event );
   }
 };
