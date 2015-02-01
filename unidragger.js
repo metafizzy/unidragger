@@ -14,25 +14,28 @@
   if ( typeof define == 'function' && define.amd ) {
     // AMD
     define( [
+      'eventie/eventie',
       'unipointer/unipointer'
-    ], function( Unipointer ) {
-      return factory( window, Unipointer );
+    ], function( eventie, Unipointer ) {
+      return factory( window, eventie, Unipointer );
     });
   } else if ( typeof exports == 'object' ) {
     // CommonJS
     module.exports = factory(
       window,
+      require('eventie'),
       require('unipointer')
     );
   } else {
     // browser global
     window.Unidragger = factory(
       window,
+      window.eventie,
       window.Unipointer
     );
   }
 
-}( window, function factory( window, Unipointer ) {
+}( window, function factory( window, eventie, Unipointer ) {
 
 'use strict';
 
@@ -95,10 +98,12 @@ Unidragger.prototype._bindHandles = function( isBind ) {
     };
   }
   // bind each handle
+  var bindMethod = isBind ? 'bind' : 'unbind';
   for ( var i=0, len = this.handles.length; i < len; i++ ) {
     var handle = this.handles[i];
     this._bindStartEvent( handle, isBind );
     binderExtra( handle );
+    eventie[ bindMethod ]( handle, 'click', this );
   }
 };
 
