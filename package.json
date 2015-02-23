@@ -1,6 +1,6 @@
 {
   "name": "unidragger",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Base draggable class",
   "main": "unidragger.js",
   "dependencies": {

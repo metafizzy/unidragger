@@ -1,5 +1,5 @@
 /*!
- * Unidragger v0.2.0
+ * Unidragger v0.2.1
  * Draggable base class
  * MIT license
  */
@@ -49,6 +49,15 @@ function preventDefaultEvent( event ) {
     event.preventDefault();
   } else {
     event.returnValue = false;
+  }
+}
+
+function getParentLink( elem ) {
+  while ( elem != document.body ) {
+    elem = elem.parentNode;
+    if ( elem.nodeName == 'A' ) {
+      return elem;
+    }
   }
 }
 
@@ -163,8 +172,9 @@ Unidragger.prototype._dragPointerDown = function( event, pointer ) {
   this.pointerDownPoint = Unipointer.getPointerPoint( pointer );
 
   var targetNodeName = event.target.nodeName;
-  // HACK iOS, allow clicks on buttons, inputs, and links
-  var isTouchstartNode = event.type == 'touchstart' && allowTouchstartNodes[ targetNodeName ];
+  // HACK iOS, allow clicks on buttons, inputs, and links, or children of links
+  var isTouchstartNode = event.type == 'touchstart' &&
+    ( allowTouchstartNodes[ targetNodeName ] || getParentLink( event.target ) );
   // do not prevent default on touchstart nodes or <select>
   if ( !isTouchstartNode && targetNodeName != 'SELECT' ) {
     preventDefaultEvent( event );
