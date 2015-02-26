@@ -1,10 +1,10 @@
 {
   "name": "unidragger",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "description": "Base draggable class",
   "main": "unidragger.js",
   "dependencies": {
-    "unipointer": "~0.1.0"
+    "unipointer": "~1.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

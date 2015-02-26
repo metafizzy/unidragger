@@ -1,9 +1,9 @@
 {
   "name": "unidragger",
   "main": "unidragger.js",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "dependencies": {
-    "unipointer": "~0.1.0"
+    "unipointer": "~1.0.0"
   },
   "authors": [
     "David DeSandro <desandrocodes@gmail.com>"
