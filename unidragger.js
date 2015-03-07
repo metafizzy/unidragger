@@ -1,5 +1,5 @@
 /*!
- * Unidragger v1.0.0
+ * Unidragger v1.1.0
  * Draggable base class
  * MIT license
  */
@@ -163,7 +163,7 @@ Unidragger.prototype.pointerDown = function( event, pointer ) {
   }
   // bind move and end events
   this._bindPostStartEvents( event );
-  this.emitEvent( 'pointerDown', [ this, event, pointer ] );
+  this.emitEvent( 'pointerDown', [ event, pointer ] );
 };
 
 // base pointer down logic
@@ -190,7 +190,7 @@ Unidragger.prototype._dragPointerDown = function( event, pointer ) {
  */
 Unidragger.prototype.pointerMove = function( event, pointer ) {
   var moveVector = this._dragPointerMove( event, pointer );
-  this.emitEvent( 'pointerMove', [ this, event, pointer, moveVector ] );
+  this.emitEvent( 'pointerMove', [ event, pointer, moveVector ] );
   this._dragMove( event, pointer, moveVector );
 };
 
@@ -222,7 +222,7 @@ Unidragger.prototype.hasDragStarted = function( moveVector ) {
  * @param {Event or Touch} pointer
  */
 Unidragger.prototype.pointerUp = function( event, pointer ) {
-  this.emitEvent( 'pointerUp', [ this, event, pointer ] );
+  this.emitEvent( 'pointerUp', [ event, pointer ] );
   this._dragPointerUp( event, pointer );
 };
 
@@ -248,7 +248,7 @@ Unidragger.prototype._dragStart = function( event, pointer ) {
 };
 
 Unidragger.prototype.dragStart = function( event, pointer ) {
-  this.emitEvent( 'dragStart', [ this, event, pointer ] );
+  this.emitEvent( 'dragStart', [ event, pointer ] );
 };
 
 // dragMove
@@ -262,7 +262,7 @@ Unidragger.prototype._dragMove = function( event, pointer, moveVector ) {
 };
 
 Unidragger.prototype.dragMove = function( event, pointer, moveVector ) {
-  this.emitEvent( 'dragMove', [ this, event, pointer, moveVector ] );
+  this.emitEvent( 'dragMove', [ event, pointer, moveVector ] );
 };
 
 // dragEnd
@@ -279,7 +279,7 @@ Unidragger.prototype._dragEnd = function( event, pointer ) {
 };
 
 Unidragger.prototype.dragEnd = function( event, pointer ) {
-  this.emitEvent( 'dragEnd', [ this, event, pointer ] );
+  this.emitEvent( 'dragEnd', [ event, pointer ] );
 };
 
 // ----- onclick ----- //
@@ -303,7 +303,7 @@ Unidragger.prototype._staticClick = function( event, pointer ) {
 };
 
 Unidragger.prototype.staticClick = function( event, pointer ) {
-  this.emitEvent( 'staticClick', [ this, event, pointer ] );
+  this.emitEvent( 'staticClick', [ event, pointer ] );
 };
 
 // -----  ----- //
