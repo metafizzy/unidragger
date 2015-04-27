@@ -1,5 +1,5 @@
 /*!
- * Unidragger v1.1.1
+ * Unidragger v1.1.2
  * Draggable base class
  * MIT license
  */
@@ -49,15 +49,6 @@ function preventDefaultEvent( event ) {
     event.preventDefault();
   } else {
     event.returnValue = false;
-  }
-}
-
-function getParentLink( elem ) {
-  while ( elem != document.body ) {
-    elem = elem.parentNode;
-    if ( elem.nodeName == 'A' ) {
-      return elem;
-    }
   }
 }
 
@@ -142,13 +133,6 @@ var disableImgOndragstart = !isIE8 ? noop : function( handle ) {
 
 // ----- start event ----- //
 
-var allowTouchstartNodes = Unidragger.allowTouchstartNodes = {
-  INPUT: true,
-  A: true,
-  BUTTON: true,
-  SELECT: true
-};
-
 /**
  * pointer start
  * @param {Event} event
@@ -171,12 +155,10 @@ Unidragger.prototype._dragPointerDown = function( event, pointer ) {
   // track to see when dragging starts
   this.pointerDownPoint = Unipointer.getPointerPoint( pointer );
 
+  // prevent default, unless touchstart or <select>
+  var isTouchstart = event.type == 'touchstart';
   var targetNodeName = event.target.nodeName;
-  // HACK iOS, allow clicks on buttons, inputs, and links, or children of links
-  var isTouchstartNode = event.type == 'touchstart' &&
-    ( allowTouchstartNodes[ targetNodeName ] || getParentLink( event.target ) );
-  // do not prevent default on touchstart nodes or <select>
-  if ( !isTouchstartNode && targetNodeName != 'SELECT' ) {
+  if ( !isTouchstart && targetNodeName != 'SELECT' ) {
     preventDefaultEvent( event );
   }
 };
@@ -262,6 +244,7 @@ Unidragger.prototype._dragMove = function( event, pointer, moveVector ) {
 };
 
 Unidragger.prototype.dragMove = function( event, pointer, moveVector ) {
+  preventDefaultEvent( event );
   this.emitEvent( 'dragMove', [ event, pointer, moveVector ] );
 };
 
