@@ -1,5 +1,5 @@
 /*!
- * Unidragger v1.1.4
+ * Unidragger v1.1.5
  * Draggable base class
  * MIT license
  */
@@ -155,6 +155,10 @@ Unidragger.prototype.pointerDown = function( event, pointer ) {
   }
   // bind move and end events
   this._bindPostStartEvents( event );
+  // track scrolling
+  this.pointerDownScroll = Unidragger.getScrollPosition();
+  eventie.bind( window, 'scroll', this );
+
   this.emitEvent( 'pointerDown', [ event, pointer ] );
 };
 
@@ -225,6 +229,10 @@ Unidragger.prototype._dragPointerUp = function( event, pointer ) {
   }
 };
 
+Unipointer.prototype.pointerDone = function() {
+  eventie.unbind( window, 'scroll', this );
+};
+
 // -------------------------- drag -------------------------- //
 
 // dragStart
@@ -273,6 +281,11 @@ Unidragger.prototype.dragEnd = function( event, pointer ) {
   this.emitEvent( 'dragEnd', [ event, pointer ] );
 };
 
+Unidragger.prototype.pointerDone = function() {
+  eventie.unbind( window, 'scroll', this );
+  delete this.pointerDownScroll;
+};
+
 // ----- onclick ----- //
 
 // handle all clicks and prevent clicks when dragging
@@ -313,12 +326,34 @@ Unidragger.prototype.staticClick = function( event, pointer ) {
   this.emitEvent( 'staticClick', [ event, pointer ] );
 };
 
-// -----  ----- //
+// ----- scroll ----- //
+
+Unidragger.prototype.onscroll = function() {
+  var scroll = Unidragger.getScrollPosition();
+  var scrollMoveX = this.pointerDownScroll.x - scroll.x;
+  var scrollMoveY = this.pointerDownScroll.y - scroll.y;
+  // cancel click/tap if scroll is too much
+  if ( Math.abs( scrollMoveX ) > 3 || Math.abs( scrollMoveY ) > 3 ) {
+    this._pointerDone();
+  }
+};
+
+// ----- utils ----- //
 
 Unidragger.getPointerPoint = function( pointer ) {
   return {
     x: pointer.pageX !== undefined ? pointer.pageX : pointer.clientX,
     y: pointer.pageY !== undefined ? pointer.pageY : pointer.clientY
+  };
+};
+
+var isPageOffset = window.pageYOffset !== undefined;
+
+// get scroll in { x, y }
+Unidragger.getScrollPosition = function() {
+  return {
+    x: isPageOffset ? window.pageXOffset : document.body.scrollLeft,
+    y: isPageOffset ? window.pageYOffset : document.body.scrollTop
   };
 };
 
