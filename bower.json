@@ -1,7 +1,7 @@
 {
   "name": "unidragger",
   "main": "unidragger.js",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "dependencies": {
     "eventie": "~1.0.6",
     "unipointer": "~1.1.0"

@@ -1,5 +1,5 @@
 /*!
- * Unidragger v1.1.3
+ * Unidragger v1.1.4
  * Draggable base class
  * MIT license
  */
@@ -139,6 +139,14 @@ var disableImgOndragstart = !isIE8 ? noop : function( handle ) {
  * @param {Event or Touch} pointer
  */
 Unidragger.prototype.pointerDown = function( event, pointer ) {
+  // dismiss range sliders
+  if ( event.target.nodeName == 'INPUT' && event.target.type == 'range' ) {
+    // reset pointerDown logic
+    this.isPointerDown = false;
+    delete this.pointerIdentifier;
+    return;
+  }
+
   this._dragPointerDown( event, pointer );
   // kludge to blur focused inputs in dragger
   var focused = document.activeElement;
