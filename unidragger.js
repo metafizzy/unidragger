@@ -1,5 +1,5 @@
 /*!
- * Unidragger v1.1.5
+ * Unidragger v1.1.6
  * Draggable base class
  * MIT license
  */
@@ -229,7 +229,7 @@ Unidragger.prototype._dragPointerUp = function( event, pointer ) {
   }
 };
 
-Unipointer.prototype.pointerDone = function() {
+Unidragger.prototype.pointerDone = function() {
   eventie.unbind( window, 'scroll', this );
 };
 
