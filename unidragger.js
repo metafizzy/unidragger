@@ -45,15 +45,15 @@ function noop() {}
 function Unidragger() {}
 
 // inherit Unipointer & EventEmitter
-Unidragger.prototype = new Unipointer();
+var proto = Unidragger.prototype = Object.create( Unipointer.prototype );
 
 // ----- bind start ----- //
 
-Unidragger.prototype.bindHandles = function() {
+proto.bindHandles = function() {
   this._bindHandles( true );
 };
 
-Unidragger.prototype.unbindHandles = function() {
+proto.unbindHandles = function() {
   this._bindHandles( false );
 };
 
@@ -62,7 +62,7 @@ var navigator = window.navigator;
  * works as unbinder, as you can .bindHandles( false ) to unbind
  * @param {Boolean} isBind - will unbind if falsey
  */
-Unidragger.prototype._bindHandles = function( isBind ) {
+proto._bindHandles = function( isBind ) {
   // munge isBind, default to true
   isBind = isBind === undefined ? true : !!isBind;
   // extra bind logic
@@ -97,7 +97,7 @@ Unidragger.prototype._bindHandles = function( isBind ) {
  * @param {Event} event
  * @param {Event or Touch} pointer
  */
-Unidragger.prototype.pointerDown = function( event, pointer ) {
+proto.pointerDown = function( event, pointer ) {
   // dismiss range sliders
   if ( event.target.nodeName == 'INPUT' && event.target.type == 'range' ) {
     // reset pointerDown logic
@@ -118,7 +118,7 @@ Unidragger.prototype.pointerDown = function( event, pointer ) {
 };
 
 // base pointer down logic
-Unidragger.prototype._dragPointerDown = function( event, pointer ) {
+proto._dragPointerDown = function( event, pointer ) {
   // track to see when dragging starts
   this.pointerDownPoint = Unipointer.getPointerPoint( pointer );
 
@@ -137,14 +137,14 @@ Unidragger.prototype._dragPointerDown = function( event, pointer ) {
  * @param {Event} event
  * @param {Event or Touch} pointer
  */
-Unidragger.prototype.pointerMove = function( event, pointer ) {
+proto.pointerMove = function( event, pointer ) {
   var moveVector = this._dragPointerMove( event, pointer );
   this.emitEvent( 'pointerMove', [ event, pointer, moveVector ] );
   this._dragMove( event, pointer, moveVector );
 };
 
 // base pointer move logic
-Unidragger.prototype._dragPointerMove = function( event, pointer ) {
+proto._dragPointerMove = function( event, pointer ) {
   var movePoint = Unipointer.getPointerPoint( pointer );
   var moveVector = {
     x: movePoint.x - this.pointerDownPoint.x,
@@ -158,7 +158,7 @@ Unidragger.prototype._dragPointerMove = function( event, pointer ) {
 };
 
 // condition if pointer has moved far enough to start drag
-Unidragger.prototype.hasDragStarted = function( moveVector ) {
+proto.hasDragStarted = function( moveVector ) {
   return Math.abs( moveVector.x ) > 3 || Math.abs( moveVector.y ) > 3;
 };
 
@@ -170,12 +170,12 @@ Unidragger.prototype.hasDragStarted = function( moveVector ) {
  * @param {Event} event
  * @param {Event or Touch} pointer
  */
-Unidragger.prototype.pointerUp = function( event, pointer ) {
+proto.pointerUp = function( event, pointer ) {
   this.emitEvent( 'pointerUp', [ event, pointer ] );
   this._dragPointerUp( event, pointer );
 };
 
-Unidragger.prototype._dragPointerUp = function( event, pointer ) {
+proto._dragPointerUp = function( event, pointer ) {
   if ( this.isDragging ) {
     this._dragEnd( event, pointer );
   } else {
@@ -187,7 +187,7 @@ Unidragger.prototype._dragPointerUp = function( event, pointer ) {
 // -------------------------- drag -------------------------- //
 
 // dragStart
-Unidragger.prototype._dragStart = function( event, pointer ) {
+proto._dragStart = function( event, pointer ) {
   this.isDragging = true;
   this.dragStartPoint = Unipointer.getPointerPoint( pointer );
   // prevent clicks
@@ -196,12 +196,12 @@ Unidragger.prototype._dragStart = function( event, pointer ) {
   this.dragStart( event, pointer );
 };
 
-Unidragger.prototype.dragStart = function( event, pointer ) {
+proto.dragStart = function( event, pointer ) {
   this.emitEvent( 'dragStart', [ event, pointer ] );
 };
 
 // dragMove
-Unidragger.prototype._dragMove = function( event, pointer, moveVector ) {
+proto._dragMove = function( event, pointer, moveVector ) {
   // do not drag if not dragging yet
   if ( !this.isDragging ) {
     return;
@@ -210,13 +210,13 @@ Unidragger.prototype._dragMove = function( event, pointer, moveVector ) {
   this.dragMove( event, pointer, moveVector );
 };
 
-Unidragger.prototype.dragMove = function( event, pointer, moveVector ) {
+proto.dragMove = function( event, pointer, moveVector ) {
   event.preventDefault();
   this.emitEvent( 'dragMove', [ event, pointer, moveVector ] );
 };
 
 // dragEnd
-Unidragger.prototype._dragEnd = function( event, pointer ) {
+proto._dragEnd = function( event, pointer ) {
   // set flags
   this.isDragging = false;
   // re-enable clicking async
@@ -228,14 +228,14 @@ Unidragger.prototype._dragEnd = function( event, pointer ) {
   this.dragEnd( event, pointer );
 };
 
-Unidragger.prototype.dragEnd = function( event, pointer ) {
+proto.dragEnd = function( event, pointer ) {
   this.emitEvent( 'dragEnd', [ event, pointer ] );
 };
 
 // ----- onclick ----- //
 
 // handle all clicks and prevent clicks when dragging
-Unidragger.prototype.onclick = function( event ) {
+proto.onclick = function( event ) {
   if ( this.isPreventingClicks ) {
     event.preventDefault();
   }
@@ -244,7 +244,7 @@ Unidragger.prototype.onclick = function( event ) {
 // ----- staticClick ----- //
 
 // triggered after pointer down & up with no/tiny movement
-Unidragger.prototype._staticClick = function( event, pointer ) {
+proto._staticClick = function( event, pointer ) {
   // ignore emulated mouse up clicks
   if ( this.isIgnoringMouseUp && event.type == 'mouseup' ) {
     return;
@@ -268,13 +268,13 @@ Unidragger.prototype._staticClick = function( event, pointer ) {
   }
 };
 
-Unidragger.prototype.staticClick = function( event, pointer ) {
+proto.staticClick = function( event, pointer ) {
   this.emitEvent( 'staticClick', [ event, pointer ] );
 };
 
 // ----- scroll ----- //
 
-Unidragger.prototype.onscroll = function() {
+proto.onscroll = function() {
   var scroll = Unidragger.getScrollPosition();
   var scrollMoveX = this.pointerDownScroll.x - scroll.x;
   var scrollMoveY = this.pointerDownScroll.y - scroll.y;
