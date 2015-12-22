@@ -1,5 +1,5 @@
 /*!
- * Unidragger v1.1.6
+ * Unidragger v2.0.0
  * Draggable base class
  * MIT license
  */
@@ -14,43 +14,31 @@
   if ( typeof define == 'function' && define.amd ) {
     // AMD
     define( [
-      'eventie/eventie',
       'unipointer/unipointer'
-    ], function( eventie, Unipointer ) {
-      return factory( window, eventie, Unipointer );
+    ], function( Unipointer ) {
+      return factory( window, Unipointer );
     });
-  } else if ( typeof exports == 'object' ) {
+  } else if ( typeof module == 'object' && module.exports ) {
     // CommonJS
     module.exports = factory(
       window,
-      require('eventie'),
       require('unipointer')
     );
   } else {
     // browser global
     window.Unidragger = factory(
       window,
-      window.eventie,
       window.Unipointer
     );
   }
 
-}( window, function factory( window, eventie, Unipointer ) {
+}( window, function factory( window, Unipointer ) {
 
 'use strict';
 
 // -----  ----- //
 
 function noop() {}
-
-// handle IE8 prevent default
-function preventDefaultEvent( event ) {
-  if ( event.preventDefault ) {
-    event.preventDefault();
-  } else {
-    event.returnValue = false;
-  }
-}
 
 // -------------------------- Unidragger -------------------------- //
 
@@ -90,44 +78,15 @@ Unidragger.prototype._bindHandles = function( isBind ) {
       handle.style.msTouchAction = isBind ? 'none' : '';
     };
   } else {
-    binderExtra = function() {
-      // TODO re-enable img.ondragstart when unbinding
-      if ( isBind ) {
-        disableImgOndragstart( handle );
-      }
-    };
+    binderExtra = noop;
   }
   // bind each handle
-  var bindMethod = isBind ? 'bind' : 'unbind';
-  for ( var i=0, len = this.handles.length; i < len; i++ ) {
+  var bindMethod = isBind ? 'addEventListener' : 'removeEventListener';
+  for ( var i=0; i < this.handles.length; i++ ) {
     var handle = this.handles[i];
     this._bindStartEvent( handle, isBind );
     binderExtra( handle );
-    eventie[ bindMethod ]( handle, 'click', this );
-  }
-};
-
-// remove default dragging interaction on all images in IE8
-// IE8 does its own drag thing on images, which messes stuff up
-
-function noDragStart() {
-  return false;
-}
-
-// TODO replace this with a IE8 test
-var isIE8 = 'attachEvent' in document.documentElement;
-
-// IE8 only
-var disableImgOndragstart = !isIE8 ? noop : function( handle ) {
-
-  if ( handle.nodeName == 'IMG' ) {
-    handle.ondragstart = noDragStart;
-  }
-
-  var images = handle.querySelectorAll('img');
-  for ( var i=0, len = images.length; i < len; i++ ) {
-    var img = images[i];
-    img.ondragstart = noDragStart;
+    handle[ bindMethod ]( 'click', this );
   }
 };
 
@@ -155,10 +114,6 @@ Unidragger.prototype.pointerDown = function( event, pointer ) {
   }
   // bind move and end events
   this._bindPostStartEvents( event );
-  // track scrolling
-  this.pointerDownScroll = Unidragger.getScrollPosition();
-  eventie.bind( window, 'scroll', this );
-
   this.emitEvent( 'pointerDown', [ event, pointer ] );
 };
 
@@ -171,7 +126,7 @@ Unidragger.prototype._dragPointerDown = function( event, pointer ) {
   var isTouchstart = event.type == 'touchstart';
   var targetNodeName = event.target.nodeName;
   if ( !isTouchstart && targetNodeName != 'SELECT' ) {
-    preventDefaultEvent( event );
+    event.preventDefault();
   }
 };
 
@@ -229,10 +184,6 @@ Unidragger.prototype._dragPointerUp = function( event, pointer ) {
   }
 };
 
-Unidragger.prototype.pointerDone = function() {
-  eventie.unbind( window, 'scroll', this );
-};
-
 // -------------------------- drag -------------------------- //
 
 // dragStart
@@ -260,7 +211,7 @@ Unidragger.prototype._dragMove = function( event, pointer, moveVector ) {
 };
 
 Unidragger.prototype.dragMove = function( event, pointer, moveVector ) {
-  preventDefaultEvent( event );
+  event.preventDefault();
   this.emitEvent( 'dragMove', [ event, pointer, moveVector ] );
 };
 
@@ -281,17 +232,12 @@ Unidragger.prototype.dragEnd = function( event, pointer ) {
   this.emitEvent( 'dragEnd', [ event, pointer ] );
 };
 
-Unidragger.prototype.pointerDone = function() {
-  eventie.unbind( window, 'scroll', this );
-  delete this.pointerDownScroll;
-};
-
 // ----- onclick ----- //
 
 // handle all clicks and prevent clicks when dragging
 Unidragger.prototype.onclick = function( event ) {
   if ( this.isPreventingClicks ) {
-    preventDefaultEvent( event );
+    event.preventDefault();
   }
 };
 
