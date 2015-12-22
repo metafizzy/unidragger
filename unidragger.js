@@ -220,10 +220,9 @@ proto._dragEnd = function( event, pointer ) {
   // set flags
   this.isDragging = false;
   // re-enable clicking async
-  var _this = this;
   setTimeout( function() {
-    delete _this.isPreventingClicks;
-  });
+    delete this.isPreventingClicks;
+  }.bind( this ) );
 
   this.dragEnd( event, pointer );
 };
@@ -260,11 +259,10 @@ proto._staticClick = function( event, pointer ) {
   // set flag for emulated clicks 300ms after touchend
   if ( event.type != 'mouseup' ) {
     this.isIgnoringMouseUp = true;
-    var _this = this;
     // reset flag after 300ms
     setTimeout( function() {
-      delete _this.isIgnoringMouseUp;
-    }, 400 );
+      delete this.isIgnoringMouseUp;
+    }.bind( this ), 400 );
   }
 };
 
