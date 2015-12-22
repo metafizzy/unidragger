@@ -189,7 +189,7 @@ Unidragger.prototype._dragPointerUp = function( event, pointer ) {
 // dragStart
 Unidragger.prototype._dragStart = function( event, pointer ) {
   this.isDragging = true;
-  this.dragStartPoint = Unidragger.getPointerPoint( pointer );
+  this.dragStartPoint = Unipointer.getPointerPoint( pointer );
   // prevent clicks
   this.isPreventingClicks = true;
 
@@ -286,26 +286,9 @@ Unidragger.prototype.onscroll = function() {
 
 // ----- utils ----- //
 
-Unidragger.getPointerPoint = function( pointer ) {
-  return {
-    x: pointer.pageX !== undefined ? pointer.pageX : pointer.clientX,
-    y: pointer.pageY !== undefined ? pointer.pageY : pointer.clientY
-  };
-};
-
-var isPageOffset = window.pageYOffset !== undefined;
-
-// get scroll in { x, y }
-Unidragger.getScrollPosition = function() {
-  return {
-    x: isPageOffset ? window.pageXOffset : document.body.scrollLeft,
-    y: isPageOffset ? window.pageYOffset : document.body.scrollTop
-  };
-};
+Unidragger.getPointerPoint = Unipointer.getPointerPoint;
 
 // -----  ----- //
-
-Unidragger.getPointerPoint = Unipointer.getPointerPoint;
 
 return Unidragger;
 
