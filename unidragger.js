@@ -122,12 +122,16 @@ proto._dragPointerDown = function( event, pointer ) {
   // track to see when dragging starts
   this.pointerDownPoint = Unipointer.getPointerPoint( pointer );
 
-  // prevent default, unless touchstart or <select>
-  var isTouchstart = event.type == 'touchstart';
-  var targetNodeName = event.target.nodeName;
-  if ( !isTouchstart && targetNodeName != 'SELECT' ) {
+  var canPreventDefault = this.canPreventDefaultOnPointerDown( event, pointer );
+  if ( canPreventDefault ) {
     event.preventDefault();
   }
+};
+
+// overwriteable method so Flickity can prevent for scrolling
+proto.canPreventDefaultOnPointerDown = function( event ) {
+  // prevent default, unless touchstart or <select>
+  return event.target.nodeName != 'SELECT';
 };
 
 // ----- move event ----- //
@@ -268,18 +272,6 @@ proto._staticClick = function( event, pointer ) {
 
 proto.staticClick = function( event, pointer ) {
   this.emitEvent( 'staticClick', [ event, pointer ] );
-};
-
-// ----- scroll ----- //
-
-proto.onscroll = function() {
-  var scroll = Unidragger.getScrollPosition();
-  var scrollMoveX = this.pointerDownScroll.x - scroll.x;
-  var scrollMoveY = this.pointerDownScroll.y - scroll.y;
-  // cancel click/tap if scroll is too much
-  if ( Math.abs( scrollMoveX ) > 3 || Math.abs( scrollMoveY ) > 3 ) {
-    this._pointerDone();
-  }
 };
 
 // ----- utils ----- //
