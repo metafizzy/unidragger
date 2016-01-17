@@ -1,5 +1,5 @@
 /*!
- * Unidragger v2.0.0
+ * Unidragger v2.1.0
  * Draggable base class
  * MIT license
  */
@@ -7,9 +7,8 @@
 /*jshint browser: true, unused: true, undef: true, strict: true */
 
 ( function( window, factory ) {
-  /*global define: false, module: false, require: false */
-  'use strict';
   // universal module definition
+  /*jshint strict: false */ /*globals define, module, require */
 
   if ( typeof define == 'function' && define.amd ) {
     // AMD
@@ -44,7 +43,7 @@ function noop() {}
 
 function Unidragger() {}
 
-// inherit Unipointer & EventEmitter
+// inherit Unipointer & EvEmitter
 var proto = Unidragger.prototype = Object.create( Unipointer.prototype );
 
 // ----- bind start ----- //
