@@ -31,7 +31,7 @@
     );
   }
 
-}( window, function factory( window, Unipointer ) {
+}( typeof window !== 'undefined' ? window : global.window, function factory( window, Unipointer ) {
 
 'use strict';
 
