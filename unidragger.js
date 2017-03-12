@@ -31,7 +31,7 @@
     );
   }
 
-}( typeof window !== 'undefined' ? window : global.window, function factory( window, Unipointer ) {
+}( typeof window !== 'undefined' ? window : this, function factory( window, Unipointer ) {
 
 'use strict';
 
@@ -56,7 +56,7 @@ proto.unbindHandles = function() {
   this._bindHandles( false );
 };
 
-var navigator = window.navigator;
+var navigator = typeof window !== 'undefined' ? window.navigator : null;
 /**
  * works as unbinder, as you can .bindHandles( false ) to unbind
  * @param {Boolean} isBind - will unbind if falsey
