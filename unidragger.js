@@ -35,10 +35,6 @@
 
 'use strict';
 
-// -----  ----- //
-
-function noop() {}
-
 // -------------------------- Unidragger -------------------------- //
 
 function Unidragger() {}
@@ -56,7 +52,6 @@ proto.unbindHandles = function() {
   this._bindHandles( false );
 };
 
-var navigator = window.navigator;
 /**
  * works as unbinder, as you can .bindHandles( false ) to unbind
  * @param {Boolean} isBind - will unbind if falsey
