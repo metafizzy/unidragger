@@ -1,5 +1,5 @@
 /*!
- * Unidragger v2.1.0
+ * Unidragger v2.2.0
  * Draggable base class
  * MIT license
  */
@@ -64,27 +64,14 @@ var navigator = window.navigator;
 proto._bindHandles = function( isBind ) {
   // munge isBind, default to true
   isBind = isBind === undefined ? true : !!isBind;
-  // extra bind logic
-  var binderExtra;
-  if ( navigator.pointerEnabled ) {
-    binderExtra = function( handle ) {
-      // disable scrolling on the element
-      handle.style.touchAction = isBind ? 'none' : '';
-    };
-  } else if ( navigator.msPointerEnabled ) {
-    binderExtra = function( handle ) {
-      // disable scrolling on the element
-      handle.style.msTouchAction = isBind ? 'none' : '';
-    };
-  } else {
-    binderExtra = noop;
-  }
+  // disable scrolling via touch
+  var touchActionValue = isBind ? 'none' : '';
   // bind each handle
   var bindMethod = isBind ? 'addEventListener' : 'removeEventListener';
   for ( var i=0; i < this.handles.length; i++ ) {
     var handle = this.handles[i];
     this._bindStartEvent( handle, isBind );
-    binderExtra( handle );
+    handle.style.touchAction = touchActionValue;
     handle[ bindMethod ]( 'click', this );
   }
 };
