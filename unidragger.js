@@ -1,5 +1,5 @@
 /*!
- * Unidragger v2.2.0
+ * Unidragger v2.2.1
  * Draggable base class
  * MIT license
  */
@@ -59,14 +59,11 @@ proto.unbindHandles = function() {
 proto._bindHandles = function( isBind ) {
   // munge isBind, default to true
   isBind = isBind === undefined ? true : !!isBind;
-  // disable scrolling via touch
-  var touchActionValue = isBind ? 'none' : '';
   // bind each handle
   var bindMethod = isBind ? 'addEventListener' : 'removeEventListener';
   for ( var i=0; i < this.handles.length; i++ ) {
     var handle = this.handles[i];
     this._bindStartEvent( handle, isBind );
-    handle.style.touchAction = touchActionValue;
     handle[ bindMethod ]( 'click', this );
   }
 };
