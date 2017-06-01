@@ -1,5 +1,5 @@
 /*!
- * Unidragger v2.2.1
+ * Unidragger v2.2.2
  * Draggable base class
  * MIT license
  */
@@ -65,6 +65,11 @@ proto._bindHandles = function( isBind ) {
     var handle = this.handles[i];
     this._bindStartEvent( handle, isBind );
     handle[ bindMethod ]( 'click', this );
+    // touch-action: none to override browser touch gestures
+    // metafizzy/flickity#540
+    if ( window.PointerEvent ) {
+      handle.style.touchAction = isBind ? 'none' : '';
+    }
   }
 };
 
