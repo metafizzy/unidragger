@@ -1,5 +1,5 @@
 /*!
- * Unidragger v2.2.2
+ * Unidragger v2.2.3
  * Draggable base class
  * MIT license
  */
@@ -68,10 +68,13 @@ proto._bindHandles = function( isBind ) {
     // touch-action: none to override browser touch gestures
     // metafizzy/flickity#540
     if ( window.PointerEvent ) {
-      handle.style.touchAction = isBind ? 'none' : '';
+      handle.style.touchAction = isBind ? this._touchActionValue : '';
     }
   }
 };
+
+// prototype so it can be overwriteable by Flickity
+proto._touchActionValue = 'none';
 
 // ----- start event ----- //
 
