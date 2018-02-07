@@ -56,7 +56,11 @@ proto.unbindHandles = function() {
  * works as unbinder, as you can .bindHandles( false ) to unbind
  * @param {Boolean} isBind - will unbind if falsey
  */
+
 proto._bindHandles = function( isBind ) {
+  // this is 'false' if compared with boolean, but has needed property
+  // can be reused later to add more properties
+  var opts = Object.defineProperty({}, 'passive', {'value': false})
   // munge isBind, default to true
   isBind = isBind === undefined ? true : !!isBind;
   // bind each handle
@@ -64,7 +68,7 @@ proto._bindHandles = function( isBind ) {
   for ( var i=0; i < this.handles.length; i++ ) {
     var handle = this.handles[i];
     this._bindStartEvent( handle, isBind );
-    handle[ bindMethod ]( 'click', this );
+    handle[ bindMethod ]( 'click', this , opts);
     // touch-action: none to override browser touch gestures
     // metafizzy/flickity#540
     if ( window.PointerEvent ) {
