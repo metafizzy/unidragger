@@ -54,4 +54,4 @@ Dragger.prototype.dragEnd = function( event, pointer ) {
 
 MIT license
 
-By [Metafizzy](http://metafizzy.co)
+By [Metafizzy 🌈🐻](https://metafizzy.co)
