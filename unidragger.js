@@ -53,22 +53,22 @@ proto.unbindHandles = function() {
 };
 
 /**
- * works as unbinder, as you can .bindHandles( false ) to unbind
- * @param {Boolean} isBind - will unbind if falsey
+ * Add or remove start event
+ * @param {Boolean} isAdd
  */
-proto._bindHandles = function( isBind ) {
-  // munge isBind, default to true
-  isBind = isBind === undefined ? true : !!isBind;
+proto._bindHandles = function( isAdd ) {
+  // munge isAdd, default to true
+  isAdd = isAdd === undefined ? true : isAdd;
   // bind each handle
-  var bindMethod = isBind ? 'addEventListener' : 'removeEventListener';
+  var bindMethod = isAdd ? 'addEventListener' : 'removeEventListener';
+  var touchAction = isAdd ? this._touchActionValue : '';
   for ( var i=0; i < this.handles.length; i++ ) {
     var handle = this.handles[i];
-    this._bindStartEvent( handle, isBind );
+    this._bindStartEvent( handle, isAdd );
     handle[ bindMethod ]( 'click', this );
-    // touch-action: none to override browser touch gestures
-    // metafizzy/flickity#540
+    // touch-action: none to override browser touch gestures. metafizzy/flickity#540
     if ( window.PointerEvent ) {
-      handle.style.touchAction = isBind ? this._touchActionValue : '';
+      handle.style.touchAction = touchAction;
     }
   }
 };
