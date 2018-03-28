@@ -150,6 +150,10 @@ proto.pointerMove = function( event, pointer ) {
   this._dragMove( event, pointer, moveVector );
 };
 
+proto._dragPointerDown = function( event, pointer ) {
+  this.pointerDownPointer = pointer;
+};
+
 // base pointer move logic
 proto._dragPointerMove = function( event, pointer ) {
   var moveVector = {
