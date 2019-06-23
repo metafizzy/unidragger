@@ -65,7 +65,7 @@ proto._bindHandles = function( isAdd ) {
   for ( var i=0; i < this.handles.length; i++ ) {
     var handle = this.handles[i];
     this._bindStartEvent( handle, isAdd );
-    handle[ bindMethod ]( 'click', this );
+    handle[ bindMethod ]( 'click', this, this.listenerOpts || false );
     // touch-action: none to override browser touch gestures. metafizzy/flickity#540
     if ( window.PointerEvent ) {
       handle.style.touchAction = touchAction;
@@ -95,7 +95,10 @@ proto.pointerDown = function( event, pointer ) {
     pageY: pointer.pageY,
   };
 
-  event.preventDefault();
+  if (this.preventDefaultOnPointerDown( event )) {
+    event.preventDefault();
+  }
+
   this.pointerDownBlur();
   // bind move and end events
   this._bindPostStartEvents( event );
@@ -119,6 +122,10 @@ var clickTypes = {
   image: true,
   file: true,
 };
+
+proto.preventDefaultOnPointerDown = function ( event ) {
+  return true
+}
 
 // dismiss inputs with text fields. flickity#403, flickity#404
 proto.okayPointerDown = function( event ) {
