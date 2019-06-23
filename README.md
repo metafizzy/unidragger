@@ -39,8 +39,8 @@ Dragger.prototype.dragStart = function( event, pointer ) {
 };
 
 Dragger.prototype.dragMove = function( event, pointer, moveVector ) {
-  var dragX = this.dragStartPoint.x + moveVector.x;
-  var dragY = this.dragStartPoint.y + moveVector.y;
+  var dragX = moveVector.x;
+  var dragY = moveVector.y;
   this.element.style.left = dragX + 'px';
   this.element.style.top = dragY + 'px';
 };
