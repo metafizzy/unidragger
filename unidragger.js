@@ -1,5 +1,5 @@
 /*!
- * Unidragger v2.3.0
+ * Unidragger v2.3.1
  * Draggable base class
  * MIT license
  */
