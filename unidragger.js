@@ -4,39 +4,32 @@
  * MIT license
  */
 
-/*jshint browser: true, unused: true, undef: true, strict: true */
-
 ( function( window, factory ) {
   // universal module definition
-  /*jshint strict: false */ /*globals define, module, require */
-
-   if ( typeof module == 'object' && module.exports ) {
+  if ( typeof module == 'object' && module.exports ) {
     // CommonJS
     module.exports = factory(
-      window,
-      require('ev-emitter')
+        window,
+        require('ev-emitter'),
     );
   } else {
     // browser global
     window.Unidragger = factory(
-      window,
-      window.EvEmitter
+        window,
+        window.EvEmitter,
     );
   }
 
 }( window, function factory( window, EvEmitter ) {
 
-'use strict';
-
 // -------------------------- Unidragger -------------------------- //
 
 function noop() {}
 
-
 function Unidragger() {}
 
 // inherit EvEmitter
-var proto = Unipointer.prototype = Object.create( EvEmitter.prototype );
+let proto = Unidragger.prototype = Object.create( EvEmitter.prototype );
 
 proto.bindStartEvent = function( elem ) {
   this._bindStartEvent( elem, true );
@@ -48,15 +41,16 @@ proto.unbindStartEvent = function( elem ) {
 
 /**
  * Add or remove start event
+ * @param {ELement} elem
  * @param {Boolean} isAdd - remove if falsey
  */
 proto._bindStartEvent = function( elem, isAdd ) {
   // munge isAdd, default to true
   isAdd = isAdd === undefined ? true : isAdd;
-  var bindMethod = isAdd ? 'addEventListener' : 'removeEventListener';
+  let bindMethod = isAdd ? 'addEventListener' : 'removeEventListener';
 
   // default to mouse events
-  var startEvent = 'mousedown';
+  let startEvent = 'mousedown';
   if ( 'ontouchstart' in window ) {
     // HACK prefer Touch Events as you can preventDefault on touchstart to
     // disable scroll in iOS & mobile Chrome metafizzy/flickity#1177
@@ -70,7 +64,7 @@ proto._bindStartEvent = function( elem, isAdd ) {
 
 // trigger handler methods for events
 proto.handleEvent = function( event ) {
-  var method = 'on' + event.type;
+  let method = 'on' + event.type;
   if ( this[ method ] ) {
     this[ method ]( event );
   }
@@ -78,8 +72,8 @@ proto.handleEvent = function( event ) {
 
 // returns the touch that we're keeping track of
 proto.getTouch = function( touches ) {
-  for ( var i=0; i < touches.length; i++ ) {
-    var touch = touches[i];
+  for ( let i = 0; i < touches.length; i++ ) {
+    let touch = touches[i];
     if ( touch.identifier == this.pointerIdentifier ) {
       return touch;
     }
@@ -90,7 +84,7 @@ proto.getTouch = function( touches ) {
 
 proto.onmousedown = function( event ) {
   // dismiss clicks from right or middle buttons
-  var button = event.button;
+  let button = event.button;
   if ( button && ( button !== 0 && button !== 1 ) ) {
     return;
   }
@@ -108,7 +102,7 @@ proto.onpointerdown = function( event ) {
 /**
  * pointer start
  * @param {Event} event
- * @param {Event or Touch} pointer
+ * @param {Event | Touch} pointer
  */
 proto._pointerDown = function( event, pointer ) {
   // dismiss right click and other pointers
@@ -132,7 +126,7 @@ proto.pointerDown = function( event, pointer ) {
 };
 
 // hash of events to be bound after start event
-var postStartEvents = {
+let postStartEvents = {
   mousedown: [ 'mousemove', 'mouseup' ],
   touchstart: [ 'touchmove', 'touchend', 'touchcancel' ],
   pointerdown: [ 'pointermove', 'pointerup', 'pointercancel' ],
@@ -143,7 +137,7 @@ proto._bindPostStartEvents = function( event ) {
     return;
   }
   // get proper events to match start event
-  var events = postStartEvents[ event.type ];
+  let events = postStartEvents[ event.type ];
   // bind events to node
   events.forEach( function( eventName ) {
     window.addEventListener( eventName, this );
@@ -177,7 +171,7 @@ proto.onpointermove = function( event ) {
 };
 
 proto.ontouchmove = function( event ) {
-  var touch = this.getTouch( event.changedTouches );
+  let touch = this.getTouch( event.changedTouches );
   if ( touch ) {
     this._pointerMove( event, touch );
   }
@@ -186,7 +180,7 @@ proto.ontouchmove = function( event ) {
 /**
  * pointer move
  * @param {Event} event
- * @param {Event or Touch} pointer
+ * @param {Event | Touch} pointer
  * @private
  */
 proto._pointerMove = function( event, pointer ) {
@@ -200,7 +194,6 @@ proto.pointerMove = function( event, pointer ) {
 
 // ----- end event ----- //
 
-
 proto.onmouseup = function( event ) {
   this._pointerUp( event, event );
 };
@@ -212,7 +205,7 @@ proto.onpointerup = function( event ) {
 };
 
 proto.ontouchend = function( event ) {
-  var touch = this.getTouch( event.changedTouches );
+  let touch = this.getTouch( event.changedTouches );
   if ( touch ) {
     this._pointerUp( event, touch );
   }
@@ -221,7 +214,7 @@ proto.ontouchend = function( event ) {
 /**
  * pointer up
  * @param {Event} event
- * @param {Event or Touch} pointer
+ * @param {Event | Touch} pointer
  * @private
  */
 proto._pointerUp = function( event, pointer ) {
@@ -260,7 +253,7 @@ proto.onpointercancel = function( event ) {
 };
 
 proto.ontouchcancel = function( event ) {
-  var touch = this.getTouch( event.changedTouches );
+  let touch = this.getTouch( event.changedTouches );
   if ( touch ) {
     this._pointerCancel( event, touch );
   }
@@ -269,7 +262,7 @@ proto.ontouchcancel = function( event ) {
 /**
  * pointer cancel
  * @param {Event} event
- * @param {Event or Touch} pointer
+ * @param {Event | Touch} pointer
  * @private
  */
 proto._pointerCancel = function( event, pointer ) {
@@ -300,10 +293,10 @@ proto._bindHandles = function( isAdd ) {
   // munge isAdd, default to true
   isAdd = isAdd === undefined ? true : isAdd;
   // bind each handle
-  var bindMethod = isAdd ? 'addEventListener' : 'removeEventListener';
-  var touchAction = isAdd ? this._touchActionValue : '';
-  for ( var i=0; i < this.handles.length; i++ ) {
-    var handle = this.handles[i];
+  let bindMethod = isAdd ? 'addEventListener' : 'removeEventListener';
+  let touchAction = isAdd ? this._touchActionValue : '';
+  for ( let i = 0; i < this.handles.length; i++ ) {
+    let handle = this.handles[i];
     this._bindStartEvent( handle, isAdd );
     handle[ bindMethod ]( 'click', this );
     // touch-action: none to override browser touch gestures. metafizzy/flickity#540
@@ -321,10 +314,10 @@ proto._touchActionValue = 'none';
 /**
  * pointer start
  * @param {Event} event
- * @param {Event or Touch} pointer
+ * @param {Event | Touch} pointer
  */
 proto.pointerDown = function( event, pointer ) {
-  var isOkay = this.okayPointerDown( event );
+  let isOkay = this.okayPointerDown( event );
   if ( !isOkay ) {
     return;
   }
@@ -343,7 +336,7 @@ proto.pointerDown = function( event, pointer ) {
 };
 
 // nodes that have text fields
-var cursorNodes = {
+let cursorNodes = {
   TEXTAREA: true,
   INPUT: true,
   SELECT: true,
@@ -351,7 +344,7 @@ var cursorNodes = {
 };
 
 // input types that do not have text fields
-var clickTypes = {
+let clickTypes = {
   radio: true,
   checkbox: true,
   button: true,
@@ -362,9 +355,9 @@ var clickTypes = {
 
 // dismiss inputs with text fields. flickity#403, flickity#404
 proto.okayPointerDown = function( event ) {
-  var isCursorNode = cursorNodes[ event.target.nodeName ];
-  var isClickType = clickTypes[ event.target.type ];
-  var isOkay = !isCursorNode || isClickType;
+  let isCursorNode = cursorNodes[ event.target.nodeName ];
+  let isClickType = clickTypes[ event.target.type ];
+  let isOkay = !isCursorNode || isClickType;
   if ( !isOkay ) {
     this._pointerReset();
   }
@@ -373,9 +366,9 @@ proto.okayPointerDown = function( event ) {
 
 // kludge to blur previously focused input
 proto.pointerDownBlur = function() {
-  var focused = document.activeElement;
+  let focused = document.activeElement;
   // do not blur body for IE10, metafizzy/flickity#117
-  var canBlur = focused && focused.blur && focused != document.body;
+  let canBlur = focused && focused.blur && focused != document.body;
   if ( canBlur ) {
     focused.blur();
   }
@@ -386,19 +379,19 @@ proto.pointerDownBlur = function() {
 /**
  * drag move
  * @param {Event} event
- * @param {Event or Touch} pointer
+ * @param {Event | Touch} pointer
  */
 proto.pointerMove = function( event, pointer ) {
-  var moveVector = this._dragPointerMove( event, pointer );
+  let moveVector = this._dragPointerMove( event, pointer );
   this.emitEvent( 'pointerMove', [ event, pointer, moveVector ] );
   this._dragMove( event, pointer, moveVector );
 };
 
 // base pointer move logic
 proto._dragPointerMove = function( event, pointer ) {
-  var moveVector = {
+  let moveVector = {
     x: pointer.pageX - this.pointerDownPointer.pageX,
-    y: pointer.pageY - this.pointerDownPointer.pageY
+    y: pointer.pageY - this.pointerDownPointer.pageY,
   };
   // start drag if pointer has moved far enough to start drag
   if ( !this.isDragging && this.hasDragStarted( moveVector ) ) {
@@ -417,7 +410,7 @@ proto.hasDragStarted = function( moveVector ) {
 /**
  * pointer up
  * @param {Event} event
- * @param {Event or Touch} pointer
+ * @param {Event | Touch} pointer
  */
 proto.pointerUp = function( event, pointer ) {
   this.emitEvent( 'pointerUp', [ event, pointer ] );
@@ -518,11 +511,11 @@ proto.staticClick = function( event, pointer ) {
 Unidragger.getPointerPoint = function( pointer ) {
   return {
     x: pointer.pageX,
-    y: pointer.pageY
+    y: pointer.pageY,
   };
 };
 // -----  ----- //
 
 return Unidragger;
 
-}));
+} ) );
