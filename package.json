@@ -18,7 +18,10 @@
   ],
   "author": "David DeSandro",
   "license": "MIT",
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-plugin-metafizzy": "^1.2.1"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/metafizzy/unidragger.git"
@@ -26,5 +29,20 @@
   "bugs": {
     "url": "https://github.com/metafizzy/unidragger/issues"
   },
-  "homepage": "https://github.com/metafizzy/unidragger"
+  "homepage": "https://github.com/metafizzy/unidragger",
+  "eslintConfig": {
+    "plugins": [ "metafizzy" ],
+    "extends": "plugin:metafizzy/browser",
+    "env": {
+      "browser": true,
+      "commonjs": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2018
+    },
+    "globals": {
+    },
+    "rules": {
+    }
+  }
 }
