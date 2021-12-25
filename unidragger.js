@@ -22,45 +22,28 @@
 
 }( window, function factory( window, EvEmitter ) {
 
-// -------------------------- Unidragger -------------------------- //
+let startEvent, activeEvents;
+if ( 'ontouchstart' in window ) {
+  // HACK prefer Touch Events as you can preventDefault on touchstart to
+  // disable scroll in iOS & mobile Chrome metafizzy/flickity#1177
+  startEvent = 'touchstart';
+  activeEvents = [ 'touchmove', 'touchend', 'touchcancel' ];
+} else if ( window.PointerEvent ) {
+  // Pointer Events
+  startEvent = 'pointerdown';
+  activeEvents = [ 'pointermove', 'pointerup', 'pointercancel' ];
+} else {
+  // mouse events
+  startEvent = 'mousedown';
+  activeEvents = [ 'mousemove', 'mouseup' ];
+}
 
-function noop() {}
+// -------------------------- Unidragger -------------------------- //
 
 function Unidragger() {}
 
 // inherit EvEmitter
 let proto = Unidragger.prototype = Object.create( EvEmitter.prototype );
-
-proto.bindStartEvent = function( elem ) {
-  this._bindStartEvent( elem, true );
-};
-
-proto.unbindStartEvent = function( elem ) {
-  this._bindStartEvent( elem, false );
-};
-
-/**
- * Add or remove start event
- * @param {ELement} elem
- * @param {Boolean} isAdd - remove if falsey
- */
-proto._bindStartEvent = function( elem, isAdd ) {
-  // munge isAdd, default to true
-  isAdd = isAdd === undefined ? true : isAdd;
-  let bindMethod = isAdd ? 'addEventListener' : 'removeEventListener';
-
-  // default to mouse events
-  let startEvent = 'mousedown';
-  if ( 'ontouchstart' in window ) {
-    // HACK prefer Touch Events as you can preventDefault on touchstart to
-    // disable scroll in iOS & mobile Chrome metafizzy/flickity#1177
-    startEvent = 'touchstart';
-  } else if ( window.PointerEvent ) {
-    // Pointer Events
-    startEvent = 'pointerdown';
-  }
-  elem[ bindMethod ]( startEvent, this );
-};
 
 // trigger handler methods for events
 proto.handleEvent = function( event ) {
@@ -70,33 +53,36 @@ proto.handleEvent = function( event ) {
   }
 };
 
-// returns the touch that we're keeping track of
-proto.getTouch = function( touches ) {
-  for ( let i = 0; i < touches.length; i++ ) {
-    let touch = touches[i];
-    if ( touch.identifier == this.pointerIdentifier ) {
-      return touch;
-    }
+// trigger method with matching pointer
+proto.withPointer = function( methodName, event ) {
+  if ( event.pointerId == this.pointerIdentifier ) {
+    this[ methodName ]( event, event );
+  }
+};
+
+// trigger method with matching touch
+proto.withTouch = function( methodName, event ) {
+  let touches = event.changedTouches.filter( function( touch ) {
+    return touch.identifier == this.pointerIdentifier;
+  }, this );
+  let touch = touches[0];
+  if ( touch ) {
+    this[ methodName ]( event, touch );
   }
 };
 
 // ----- start event ----- //
 
 proto.onmousedown = function( event ) {
-  // dismiss clicks from right or middle buttons
-  let button = event.button;
-  if ( button && ( button !== 0 && button !== 1 ) ) {
-    return;
-  }
-  this._pointerDown( event, event );
+  this.pointerDown( event, event );
 };
 
 proto.ontouchstart = function( event ) {
-  this._pointerDown( event, event.changedTouches[0] );
+  this.pointerDown( event, event.changedTouches[0] );
 };
 
 proto.onpointerdown = function( event ) {
-  this._pointerDown( event, event );
+  this.pointerDown( event, event );
 };
 
 /**
@@ -104,7 +90,7 @@ proto.onpointerdown = function( event ) {
  * @param {Event} event
  * @param {Event | Touch} pointer
  */
-proto._pointerDown = function( event, pointer ) {
+proto.pointerDown = function( event, pointer ) {
   // dismiss right click and other pointers
   // button = 0 is okay, 1-4 not
   if ( event.button || this.isPointerDown ) {
@@ -118,63 +104,37 @@ proto._pointerDown = function( event, pointer ) {
     pointer.pointerId : pointer.identifier;
 
   this.pointerDown( event, pointer );
-};
-
-proto.pointerDown = function( event, pointer ) {
-  this._bindPostStartEvents( event );
   this.emitEvent( 'pointerDown', [ event, pointer ] );
 };
 
-// hash of events to be bound after start event
-let postStartEvents = {
-  mousedown: [ 'mousemove', 'mouseup' ],
-  touchstart: [ 'touchmove', 'touchend', 'touchcancel' ],
-  pointerdown: [ 'pointermove', 'pointerup', 'pointercancel' ],
-};
+// proto.pointerDown = function( event, pointer ) {
+//   this.bindActivePointerEvents( event );
+// };
 
-proto._bindPostStartEvents = function( event ) {
-  if ( !event ) {
-    return;
-  }
-  // get proper events to match start event
-  let events = postStartEvents[ event.type ];
-  // bind events to node
-  events.forEach( function( eventName ) {
+proto.bindActivePointerEvents = function() {
+  activeEvents.forEach( ( eventName ) => {
     window.addEventListener( eventName, this );
-  }, this );
-  // save these arguments
-  this._boundPointerEvents = events;
+  } );
 };
 
-proto._unbindPostStartEvents = function() {
-  // check for _boundEvents, in case dragEnd triggered twice (old IE8 bug)
-  if ( !this._boundPointerEvents ) {
-    return;
-  }
-  this._boundPointerEvents.forEach( function( eventName ) {
+proto.unbindActivePointerEvents = function() {
+  activeEvents.forEach( ( eventName ) => {
     window.removeEventListener( eventName, this );
-  }, this );
-
-  delete this._boundPointerEvents;
+  } );
 };
 
 // ----- move event ----- //
 
 proto.onmousemove = function( event ) {
-  this._pointerMove( event, event );
+  this.pointerMove( event, event );
 };
 
 proto.onpointermove = function( event ) {
-  if ( event.pointerId == this.pointerIdentifier ) {
-    this._pointerMove( event, event );
-  }
+  this.withPointer( 'pointerMove', event );
 };
 
 proto.ontouchmove = function( event ) {
-  let touch = this.getTouch( event.changedTouches );
-  if ( touch ) {
-    this._pointerMove( event, touch );
-  }
+  this.withTouch( 'pointerMove', event );
 };
 
 /**
@@ -183,11 +143,6 @@ proto.ontouchmove = function( event ) {
  * @param {Event | Touch} pointer
  * @private
  */
-proto._pointerMove = function( event, pointer ) {
-  this.pointerMove( event, pointer );
-};
-
-// public
 proto.pointerMove = function( event, pointer ) {
   this.emitEvent( 'pointerMove', [ event, pointer ] );
 };
@@ -195,184 +150,112 @@ proto.pointerMove = function( event, pointer ) {
 // ----- end event ----- //
 
 proto.onmouseup = function( event ) {
-  this._pointerUp( event, event );
+  this.pointerUp( event, event );
 };
 
 proto.onpointerup = function( event ) {
-  if ( event.pointerId == this.pointerIdentifier ) {
-    this._pointerUp( event, event );
-  }
+  this.withPointer( 'pointerUp', event );
 };
 
 proto.ontouchend = function( event ) {
-  let touch = this.getTouch( event.changedTouches );
-  if ( touch ) {
-    this._pointerUp( event, touch );
-  }
+  this.withTouch( 'pointerUp', event );
 };
 
 /**
  * pointer up
  * @param {Event} event
  * @param {Event | Touch} pointer
- * @private
  */
-proto._pointerUp = function( event, pointer ) {
-  this._pointerDone();
-  this.pointerUp( event, pointer );
-};
-
-// public
 proto.pointerUp = function( event, pointer ) {
+  this.pointerDone();
   this.emitEvent( 'pointerUp', [ event, pointer ] );
 };
 
 // ----- pointer done ----- //
 
 // triggered on pointer up & pointer cancel
-proto._pointerDone = function() {
-  this._pointerReset();
-  this._unbindPostStartEvents();
-  this.pointerDone();
+proto.pointerDone = function() {
+  this.pointerReset();
+  this.unbindActivePointerEvents();
+  this.emitEvent('pointerDone');
 };
 
-proto._pointerReset = function() {
+proto.pointerReset = function() {
   // reset properties
   this.isPointerDown = false;
   delete this.pointerIdentifier;
 };
 
-proto.pointerDone = noop;
-
 // ----- pointer cancel ----- //
 
 proto.onpointercancel = function( event ) {
-  if ( event.pointerId == this.pointerIdentifier ) {
-    this._pointerCancel( event, event );
-  }
+  this.withPointer( 'pointerCancel', event );
 };
 
 proto.ontouchcancel = function( event ) {
-  let touch = this.getTouch( event.changedTouches );
-  if ( touch ) {
-    this._pointerCancel( event, touch );
-  }
+  this.withTouch( 'pointerCancel', event );
 };
 
 /**
  * pointer cancel
  * @param {Event} event
  * @param {Event | Touch} pointer
- * @private
  */
-proto._pointerCancel = function( event, pointer ) {
-  this._pointerDone();
-  this.pointerCancel( event, pointer );
-};
-
-// public
 proto.pointerCancel = function( event, pointer ) {
+  this.pointerDone();
   this.emitEvent( 'pointerCancel', [ event, pointer ] );
 };
 
 // ----- bind start ----- //
 
+// prototype so it can be overwriteable by Flickity
+proto.touchActionValue = 'none';
+
 proto.bindHandles = function() {
-  this._bindHandles( true );
+  this._bindHandles( 'addEventListener', this.touchActionValue );
 };
 
 proto.unbindHandles = function() {
-  this._bindHandles( false );
+  this._bindHandles( 'removeEventListener', '' );
 };
 
 /**
  * Add or remove start event
- * @param {Boolean} isAdd
+ * @param {String} bindMethod - addEventListener or removeEventListener
+ * @param {String} touchAction - value for touch-action CSS property
  */
-proto._bindHandles = function( isAdd ) {
-  // munge isAdd, default to true
-  isAdd = isAdd === undefined ? true : isAdd;
-  // bind each handle
-  let bindMethod = isAdd ? 'addEventListener' : 'removeEventListener';
-  let touchAction = isAdd ? this._touchActionValue : '';
-  for ( let i = 0; i < this.handles.length; i++ ) {
-    let handle = this.handles[i];
-    this._bindStartEvent( handle, isAdd );
+proto._bindHandles = function( bindMethod, touchAction ) {
+  this.handles.forEach( ( handle ) => {
+    handle[ bindMethod ]( startEvent, this );
     handle[ bindMethod ]( 'click', this );
     // touch-action: none to override browser touch gestures. metafizzy/flickity#540
-    if ( window.PointerEvent ) {
-      handle.style.touchAction = touchAction;
-    }
-  }
+    if ( window.PointerEvent ) handle.style.touchAction = touchAction;
+  } );
 };
-
-// prototype so it can be overwriteable by Flickity
-proto._touchActionValue = 'none';
 
 // ----- start event ----- //
 
-/**
- * pointer start
- * @param {Event} event
- * @param {Event | Touch} pointer
- */
-proto.pointerDown = function( event, pointer ) {
-  let isOkay = this.okayPointerDown( event );
-  if ( !isOkay ) {
-    return;
-  }
-  // track start event position
-  // Safari 9 overrides pageX and pageY. These values needs to be copied. flickity#842
-  this.pointerDownPointer = {
-    pageX: pointer.pageX,
-    pageY: pointer.pageY,
-  };
-
-  event.preventDefault();
-  this.pointerDownBlur();
-  // bind move and end events
-  this._bindPostStartEvents( event );
-  this.emitEvent( 'pointerDown', [ event, pointer ] );
-};
-
 // nodes that have text fields
-let cursorNodes = {
-  TEXTAREA: true,
-  INPUT: true,
-  SELECT: true,
-  OPTION: true,
-};
+const cursorNodes = [ 'TEXTAREA', 'INPUT', 'SELECT', 'OPTION' ];
 
 // input types that do not have text fields
-let clickTypes = {
-  radio: true,
-  checkbox: true,
-  button: true,
-  submit: true,
-  image: true,
-  file: true,
-};
+const clickTypes = [ 'radio', 'checkbox', 'button', 'submit', 'image', 'file' ];
 
 // dismiss inputs with text fields. flickity#403, flickity#404
 proto.okayPointerDown = function( event ) {
-  let isCursorNode = cursorNodes[ event.target.nodeName ];
-  let isClickType = clickTypes[ event.target.type ];
+  let isCursorNode = cursorNodes.includes( event.target.nodeName );
+  let isClickType = clickTypes.includes()[ event.target.type ];
   let isOkay = !isCursorNode || isClickType;
   if ( !isOkay ) {
-    this._pointerReset();
+    this.pointerReset();
   }
   return isOkay;
 };
 
-// kludge to blur previously focused input
-proto.pointerDownBlur = function() {
-  let focused = document.activeElement;
-  // do not blur body for IE10, metafizzy/flickity#117
-  let canBlur = focused && focused.blur && focused != document.body;
-  if ( canBlur ) {
-    focused.blur();
-  }
-};
+// blur previously focused input
+// proto.pointerDownBlur = function() {
+//   document.activeElement.blur()
+// };
 
 // ----- move event ----- //
 
@@ -422,7 +305,7 @@ proto._dragPointerUp = function( event, pointer ) {
     this._dragEnd( event, pointer );
   } else {
     // pointer didn't move enough for drag to start
-    this._staticClick( event, pointer );
+    this.staticClick( event, pointer );
   }
 };
 
@@ -460,9 +343,9 @@ proto._dragEnd = function( event, pointer ) {
   // set flags
   this.isDragging = false;
   // re-enable clicking async
-  setTimeout( function() {
+  setTimeout( () => {
     delete this.isPreventingClicks;
-  }.bind( this ) );
+  } );
 
   this.dragEnd( event, pointer );
 };
@@ -483,13 +366,13 @@ proto.onclick = function( event ) {
 // ----- staticClick ----- //
 
 // triggered after pointer down & up with no/tiny movement
-proto._staticClick = function( event, pointer ) {
+proto.staticClick = function( event, pointer ) {
   // ignore emulated mouse up clicks
   if ( this.isIgnoringMouseUp && event.type == 'mouseup' ) {
     return;
   }
 
-  this.staticClick( event, pointer );
+  this.emitEvent( 'staticClick', [ event, pointer ] );
 
   // set flag for emulated clicks 300ms after touchend
   if ( event.type != 'mouseup' ) {
@@ -501,19 +384,6 @@ proto._staticClick = function( event, pointer ) {
   }
 };
 
-proto.staticClick = function( event, pointer ) {
-  this.emitEvent( 'staticClick', [ event, pointer ] );
-};
-
-// ----- utils ----- //
-
-// utility function for getting x/y coords from event
-Unidragger.getPointerPoint = function( pointer ) {
-  return {
-    x: pointer.pageX,
-    y: pointer.pageY,
-  };
-};
 // -----  ----- //
 
 return Unidragger;
