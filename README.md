@@ -2,7 +2,7 @@
 
 _Base draggable class_
 
-Used in [Flickity](http://flickity.metafizzy.co) and [Draggabilly](http://draggabilly.desandro.com).
+Used in [Flickity](https://flickity.metafizzy.co) and [Draggabilly](https://draggabilly.desandro.com).
 
 Unidragger handles all the event binding and handling to support a draggable library.
 
@@ -13,9 +13,9 @@ Unidragger handles all the event binding and handling to support a draggable lib
 
 ## Install
 
-Bower: `bower install unidragger --save`
+npm: `npm install unidragger`
 
-npm: `npm install unidragger --save`
+Yarn: `yarn add unidragger`
 
 ## Demo code
 

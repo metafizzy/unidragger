@@ -4,10 +4,11 @@
   "description": "Base draggable class",
   "main": "unidragger.js",
   "dependencies": {
-    "unipointer": "^2.4.0"
+    "ev-emitter": "^2.0.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "npx eslint .",
+    "test": "npm run lint"
   },
   "keywords": [
     "draggable",

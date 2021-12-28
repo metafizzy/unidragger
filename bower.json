@@ -2,7 +2,7 @@
   "name": "unidragger",
   "main": "unidragger.js",
   "dependencies": {
-    "unipointer": "^2.4.0"
+    "ev-emitter": "^2.0.0"
   },
   "authors": [
     "David DeSandro <desandrocodes@gmail.com>"
