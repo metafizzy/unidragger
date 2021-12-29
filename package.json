@@ -1,6 +1,6 @@
 {
   "name": "unidragger",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "description": "Base draggable class",
   "main": "unidragger.js",
   "dependencies": {
@@ -32,7 +32,9 @@
   },
   "homepage": "https://github.com/metafizzy/unidragger",
   "eslintConfig": {
-    "plugins": [ "metafizzy" ],
+    "plugins": [
+      "metafizzy"
+    ],
     "extends": "plugin:metafizzy/browser",
     "env": {
       "browser": true,
@@ -41,9 +43,7 @@
     "parserOptions": {
       "ecmaVersion": 2018
     },
-    "globals": {
-    },
-    "rules": {
-    }
+    "globals": {},
+    "rules": {}
   }
 }
