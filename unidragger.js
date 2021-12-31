@@ -1,5 +1,5 @@
 /*!
- * Unidragger v3.0.0
+ * Unidragger v3.0.1
  * Draggable base class
  * MIT license
  */
@@ -94,7 +94,7 @@ proto.unbindActivePointerEvents = function() {
 
 // trigger method with matching pointer
 proto.withPointer = function( methodName, event ) {
-  if ( event.pointerId == this.pointerIdentifier ) {
+  if ( event.pointerId === this.pointerIdentifier ) {
     this[ methodName ]( event, event );
   }
 };
@@ -103,7 +103,7 @@ proto.withPointer = function( methodName, event ) {
 proto.withTouch = function( methodName, event ) {
   let touch;
   for ( let changedTouch of event.changedTouches ) {
-    if ( changedTouch.identifier == this.pointerIdentifier ) {
+    if ( changedTouch.identifier === this.pointerIdentifier ) {
       touch = changedTouch;
     }
   }
@@ -147,8 +147,12 @@ proto.pointerDown = function( event, pointer ) {
   this.pointerIdentifier = pointer.pointerId !== undefined ?
     // pointerId for pointer events, touch.indentifier for touch events
     pointer.pointerId : pointer.identifier;
+  // track position for move
+  this.pointerDownPointer = {
+    pageX: pointer.pageX,
+    pageY: pointer.pageY,
+  };
 
-  this.pointerDown( event, pointer );
   this.bindActivePointerEvents();
   this.emitEvent( 'pointerDown', [ event, pointer ] );
 };
@@ -263,7 +267,7 @@ proto.onclick = function( event ) {
 // triggered after pointer down & up with no/tiny movement
 proto.staticClick = function( event, pointer ) {
   // ignore emulated mouse up clicks
-  let isMouseup = event.type == 'mouseup';
+  let isMouseup = event.type === 'mouseup';
   if ( isMouseup && this.isIgnoringMouseUp ) return;
 
   this.emitEvent( 'staticClick', [ event, pointer ] );
